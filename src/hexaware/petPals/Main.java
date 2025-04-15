@@ -92,7 +92,7 @@ public class Main {
                         System.out.print("Enter Amount: ");
                         double amount = sc.nextDouble();
                         sc.nextLine();
-                        if (amount < 10.0) throw new InsufficientFundsException("Minimum donation is $10.");
+                        if (amount < 100.0) throw new InsufficientFundsException("Minimum donation is Rs100.");
                         LocalDate today = LocalDate.now();
 
                         CashDonation donation = new CashDonation(donor, amount, today);
