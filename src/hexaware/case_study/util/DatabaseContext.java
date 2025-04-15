@@ -9,7 +9,6 @@ public class DatabaseContext {
     private static final String PASSWORD = "pass";
 
     public static Connection getConnection() throws SQLException {
-        // Always return a fresh connection
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
