@@ -10,6 +10,14 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    private static boolean isValidEmail(String email) {
+        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    }
+
+    private static boolean isValidMobile(String phone) {
+        return phone.matches("^[6-9]\\d{9}$");
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         CustomerService customerService = new CustomerService();
@@ -139,10 +147,21 @@ public class Main {
         String fname = scanner.nextLine();
         System.out.print("Last Name: ");
         String lname = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Phone: ");
-        String phone = scanner.nextLine();
+        String email;
+        while (true) {
+            System.out.print("Email: ");
+            email = scanner.nextLine();
+            if (isValidEmail(email)) break;
+            System.out.println("Invalid email format");
+        }
+
+        String phone;
+        while (true) {
+            System.out.print("Phone (10 digits): ");
+            phone = scanner.nextLine();
+            if (isValidMobile(phone)) break;
+            System.out.println("Invalid mobile number. Must start with 6-9 and be 10 digits.");
+        }
         System.out.print("Address: ");
         String address = scanner.nextLine();
         System.out.print("Username: ");
