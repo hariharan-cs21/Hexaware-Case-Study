@@ -60,35 +60,48 @@ public class VehicleService implements IVehicleService {
         }
     }
 
-    @Override
-    public void updateVehicle(Vehicle vehicle) {
-        try (Connection conn = DatabaseContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                     "UPDATE Vehicles SET Model=?, Make=?, Year=?, Color=?, RegistrationNumber=?, Availability=?, DailyRate=? WHERE VehicleID=?")) {
-            stmt.setString(1, vehicle.getModel());
-            stmt.setString(2, vehicle.getMake());
-            stmt.setInt(3, vehicle.getYear());
-            stmt.setString(4, vehicle.getColor());
-            stmt.setString(5, vehicle.getRegistrationNumber());
-            stmt.setBoolean(6, vehicle.isAvailability());
-            stmt.setDouble(7, vehicle.getDailyRate());
-            stmt.setInt(8, vehicle.getVehicleId());
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getMessage());
-        }
-    }
+//    @Override
+//    public void updateVehicle(Vehicle vehicle) {
+//        try (Connection conn = DatabaseContext.getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(
+//                     "UPDATE Vehicles SET Model=?, Make=?, Year=?, Color=?, RegistrationNumber=?, Availability=?, DailyRate=? WHERE VehicleID=?")) {
+//            stmt.setString(1, vehicle.getModel());
+//            stmt.setString(2, vehicle.getMake());
+//            stmt.setInt(3, vehicle.getYear());
+//            stmt.setString(4, vehicle.getColor());
+//            stmt.setString(5, vehicle.getRegistrationNumber());
+//            stmt.setBoolean(6, vehicle.isAvailability());
+//            stmt.setDouble(7, vehicle.getDailyRate());
+//            stmt.setInt(8, vehicle.getVehicleId());
+//            stmt.executeUpdate();
+//        } catch (SQLException e) {
+//            throw new DatabaseConnectionException(e.getMessage());
+//        }
+//    }
 
     @Override
     public void removeVehicle(int vehicleId) {
-        try (Connection conn = DatabaseContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("DELETE FROM Vehicles WHERE VehicleID=?")) {
-            stmt.setInt(1, vehicleId);
-            stmt.executeUpdate();
+        try (Connection conn = DatabaseContext.getConnection()) {
+            try (PreparedStatement deleteReservationsStmt = conn.prepareStatement("DELETE FROM Reservations WHERE VehicleID = ?")) {
+                deleteReservationsStmt.setInt(1, vehicleId);
+                int reservationsDeleted = deleteReservationsStmt.executeUpdate();
+                System.out.println(reservationsDeleted + " reservation(s) deleted.");
+
+                try (PreparedStatement deleteVehicleStmt = conn.prepareStatement("DELETE FROM Vehicles WHERE VehicleID = ?")) {
+                    deleteVehicleStmt.setInt(1, vehicleId);
+                    int vehicleDeleted = deleteVehicleStmt.executeUpdate();
+                    if (vehicleDeleted == 0) {
+                        System.out.println("No vehicle found with the given ID.");
+                    } else {
+                        System.out.println("Vehicle removed successfully.");
+                    }
+                }
+            }
         } catch (SQLException e) {
-            throw new DatabaseConnectionException(e.getMessage());
+            throw new DatabaseConnectionException("Error while deleting vehicle or reservations: " + e.getMessage());
         }
     }
+
 
     private Vehicle map(ResultSet rs) throws SQLException {
         return new Vehicle(
@@ -124,6 +137,21 @@ public class VehicleService implements IVehicleService {
         }
         return vehicles;
     }
+    public void updateVehicleAvailability(int vehicleId) {
+        try (Connection conn = DatabaseContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("UPDATE Vehicles SET availability = 0 WHERE VehicleId = ?")) {
+            stmt.setInt(1, vehicleId);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Vehicle availability updated to unavailable.");
+            } else {
+                System.out.println("Vehicle ID not found ");
+            }
+        } catch (SQLException e) {
+            throw new DatabaseConnectionException("Error updating vehicle availability: " + e.getMessage());
+        }
+    }
+
 
 
 }

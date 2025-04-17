@@ -2,7 +2,6 @@ package hexaware.case_study.service;
 
 
 import  hexaware.case_study.entity.Admin;
-import hexaware.case_study.entity.Customer;
 import  hexaware.case_study.util.DatabaseContext;
 import  hexaware.case_study.service.interfaces.IAdminService;
 import  hexaware.case_study.exception.*;

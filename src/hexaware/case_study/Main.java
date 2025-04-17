@@ -2,6 +2,7 @@ package hexaware.case_study;
 
 import hexaware.case_study.entity.*;
 import hexaware.case_study.service.*;
+import hexaware.case_study.exception.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,18 +51,19 @@ public class Main {
         String username = scanner.nextLine();
         System.out.print("Password: ");
         String password = scanner.nextLine();
-
+        try {
         Customer loggedInCustomer = customerService.authenticate(username, password);
         if (loggedInCustomer == null) {
             System.out.println("Login failed.");
             return;
         }
 
+
         System.out.println("Welcome, " + loggedInCustomer.getFirstName());
 
         boolean logout = false;
         while (!logout) {
-            System.out.println("\n--- Customer Menu ---");
+            System.out.println("\nCustomer Menu");
             System.out.println("1. View Available Vehicles");
             System.out.println("2. Make Reservation");
             System.out.println("3. View My Reservations");
@@ -98,10 +100,11 @@ public class Main {
                     System.out.println("Inserting reservation with total cost: " + reservation.getTotalCost());
 
                     reservationService.createReservation(reservation);
+                    vehicleService.updateVehicleAvailability(vehicleId);
                     System.out.println("Reservation created.");
                 }
                 case 3 -> {
-                    System.out.println("\n--- Your Reservations ---");
+                    System.out.println("\nYour Reservations");
                     List<Reservation> reservations = reservationService.getReservationsByCustomerId(loggedInCustomer.getCustomerId());
                     if (reservations.isEmpty()) {
                         System.out.println("You have no reservations.");
@@ -120,6 +123,13 @@ public class Main {
                 case 4 -> logout = true;
                 default -> System.out.println("Invalid.");
             }
+        }
+        } catch (CustomerNotFoundException e) {
+            System.out.println("Login failed: " + e.getMessage());
+        } catch (DatabaseConnectionException e) {
+            System.out.println("Database error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
         }
     }
 
@@ -150,7 +160,7 @@ public class Main {
         String username = scanner.nextLine();
         System.out.print("Password: ");
         String password = scanner.nextLine();
-
+try{
         Admin admin = adminService.authenticate(username, password);
         if (admin == null) {
             System.out.println("Admin login failed.");
@@ -166,7 +176,8 @@ public class Main {
             System.out.println("2. View All Reservations");
             System.out.println("3. View All Vehicles");
             System.out.println("4. Add Vehicle");
-            System.out.println("5. Logout");
+            System.out.println("5. Remove Vehicle");
+            System.out.println("6. Logout");
             System.out.print("Choose: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -213,14 +224,29 @@ public class Main {
                     vehicleService.addVehicle(newVehicle);
                     System.out.println("Vehicle added successfully.");
                 }
-                case 5 -> logout = true;
+                case 5 -> {
+                    System.out.println("\nRemove Vehicle");
+                    System.out.print("Enter Vehicle ID to remove: ");
+                    int vehicleId = scanner.nextInt();
+                    scanner.nextLine();
+
+                    vehicleService.removeVehicle(vehicleId);
+                }
+                case 6 -> logout = true;
                 default -> System.out.println("Invalid.");
             }
         }
+} catch (CustomerNotFoundException e) {
+    System.out.println("Login failed: " + e.getMessage());
+} catch (DatabaseConnectionException e) {
+    System.out.println("Database error: " + e.getMessage());
+} catch (Exception e) {
+    System.out.println("An unexpected error occurred: " + e.getMessage());
+}
     }
 
     private static void handleAdminRegister(Scanner scanner, AdminService adminService) {
-        System.out.println("--- Register New Admin ---");
+        System.out.println(" Register New Admin ");
         System.out.print("First Name: ");
         String fname = scanner.nextLine();
         System.out.print("Last Name: ");

@@ -19,15 +19,15 @@ public class Main {
         AdoptionEventDAO eventDAO = new AdoptionEventDAOImpl();
 
         while (true) {
-            System.out.println("1. Add Pet");
-            System.out.println("2. List Available Pets");
-            System.out.println("3. Make Cash Donation");
-            System.out.println("4. Create Adoption Event");
-            System.out.println("5. View Adoption Events");
-            System.out.println("6. Register for Adoption Event");
-            System.out.println("7. Adopt a Pet");
-            System.out.println("8. View Event Participants");
-            System.out.println("9. View All Donations");
+            System.out.println("1. add Pet");
+            System.out.println("2. show available pets");
+            System.out.println("3. make cash donation");
+            System.out.println("4. create adoption event");
+            System.out.println("5. view adoption events");
+            System.out.println("6. register for adoption event");
+            System.out.println("7. adopt a pet");
+            System.out.println("8. view event participants");
+            System.out.println("9. view all donations");
             System.out.println("10. Exit");
             System.out.print("Choose an option: ");
             int choice = sc.nextInt();
@@ -36,7 +36,7 @@ public class Main {
             switch (choice) {
                 case 1:
                     try {
-                        System.out.print("Enter Pet Type (Dog/Cat/Other): ");
+                        System.out.print("Enter Pet Type Dog,Cat: ");
                         String type = sc.nextLine();
                         System.out.print("Enter Name: ");
                         String name = sc.nextLine();
@@ -75,13 +75,13 @@ public class Main {
                             System.out.println("\nAvailable Pets:");
                             for (Pet pet : pets) {
                                 if (pet.getName() == null || pet.getAge() == 0) {
-                                    throw new NullPointerException("Pet information is incomplete.");
+                                    throw new NullPointerException("No information");
                                 }
                                 System.out.println(pet);
                             }
                         }
                     } catch (NullPointerException e) {
-                        System.out.println("Missing pet info: " + e.getMessage());
+                        System.out.println(e.getMessage());
                     }
                     break;
 
@@ -92,7 +92,7 @@ public class Main {
                         System.out.print("Enter Amount: ");
                         double amount = sc.nextDouble();
                         sc.nextLine();
-                        if (amount < 100.0) throw new InsufficientFundsException("Minimum donation is Rs100.");
+                        if (amount < 100.0) throw new InsufficientFundsException("Minimum donation is Rs 100");
                         LocalDate today = LocalDate.now();
 
                         CashDonation donation = new CashDonation(donor, amount, today);
@@ -136,7 +136,7 @@ public class Main {
 
                         eventDAO.registerParticipant(pname, eid);
                     } catch (SQLException e) {
-                        System.out.println("Error registering for event: " + e.getMessage());
+                        System.out.println("Error registering for event " + e.getMessage());
                     }
                     break;
 
@@ -165,6 +165,7 @@ public class Main {
                     break;
 
                 case 10:
+                    System.out.println("Bye");
                     return;
 
                 default:

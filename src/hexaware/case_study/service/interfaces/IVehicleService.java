@@ -8,6 +8,6 @@ public interface IVehicleService {
     Vehicle getVehicleById(int vehicleId);
     List<Vehicle> getAvailableVehicles();
     void addVehicle(Vehicle vehicle);
-    void updateVehicle(Vehicle vehicle);
+    void updateVehicleAvailability(int vehicleId);
     void removeVehicle(int vehicleId);
 }
