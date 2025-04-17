@@ -75,7 +75,8 @@ public class Main {
             System.out.println("1. View Available Vehicles");
             System.out.println("2. Make Reservation");
             System.out.println("3. View My Reservations");
-            System.out.println("4. Logout");
+            System.out.println("4. Cancel Reservations");
+            System.out.println("5. Logout");
             System.out.print("Choose: ");
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -128,7 +129,19 @@ public class Main {
                         }
                     }
                 }
-                case 4 -> logout = true;
+                case 4 -> {
+                    System.out.print("Vehicle ID: ");
+                    int vehicleId = scanner.nextInt();
+                    try {
+                        reservationService.cancelReservation(vehicleId);
+                        System.out.println("Reservation deleted.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    } catch (DatabaseConnectionException e) {
+                        System.out.println("Database error occurred: " + e.getMessage());
+                    }
+                }
+                case 5 -> logout = true;
                 default -> System.out.println("Invalid.");
             }
         }
@@ -142,7 +155,7 @@ public class Main {
     }
 
     private static void handleCustomerRegister(Scanner scanner, CustomerService customerService) {
-        System.out.println("--- Register New Customer ---");
+        System.out.println("Register New Customer");
         System.out.print("First Name: ");
         String fname = scanner.nextLine();
         System.out.print("Last Name: ");
@@ -190,7 +203,7 @@ try{
 
         boolean logout = false;
         while (!logout) {
-            System.out.println("\n--- Admin Menu ---");
+            System.out.println("\n Admin Menu ");
             System.out.println("1. View All Customers");
             System.out.println("2. View All Reservations");
             System.out.println("3. View All Vehicles");
@@ -210,8 +223,13 @@ try{
                 }
                 case 2 -> {
                     List<Reservation> reservations = reservationService.getAllReservations();
-                    for (Reservation r : reservations) {
-                        System.out.println("Reservation #" + r.getReservationID() + " | Customer ID: " + r.getCustomerID() + " | Vehicle ID: " + r.getVehicleID());
+                    if (reservations.isEmpty()) {
+                        System.out.println("There are no reservations.");
+                    }
+                    else {
+                        for (Reservation r : reservations) {
+                            System.out.println("Reservation #" + r.getReservationID() + " | Customer ID: " + r.getCustomerID() + " | Vehicle ID: " + r.getVehicleID());
+                        }
                     }
                 }
                 case 3 -> {
@@ -221,7 +239,7 @@ try{
                     }
                 }
                 case 4 -> {
-                    System.out.println("\n--- Add New Vehicle ---");
+                    System.out.println("\n Add New Vehicle ");
                     System.out.print("Model: ");
                     String model = scanner.nextLine();
                     System.out.print("Make: ");
@@ -270,10 +288,21 @@ try{
         String fname = scanner.nextLine();
         System.out.print("Last Name: ");
         String lname = scanner.nextLine();
-        System.out.print("Email: ");
-        String email = scanner.nextLine();
-        System.out.print("Phone: ");
-        String phone = scanner.nextLine();
+        String email;
+        while (true) {
+            System.out.print("Email: ");
+            email = scanner.nextLine();
+            if (isValidEmail(email)) break;
+            System.out.println("Invalid email format");
+        }
+
+        String phone;
+        while (true) {
+            System.out.print("Phone (10 digits): ");
+            phone = scanner.nextLine();
+            if (isValidMobile(phone)) break;
+            System.out.println("Invalid mobile number. Must start with 6-9 and be 10 digits.");
+        }
         System.out.print("Username: ");
         String uname = scanner.nextLine();
         System.out.print("Password: ");

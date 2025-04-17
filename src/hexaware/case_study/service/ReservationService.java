@@ -1,13 +1,13 @@
 package hexaware.case_study.service;
 
 
-import  hexaware.case_study.entity.Reservation;
-import  hexaware.case_study.util.DatabaseContext;
-import  hexaware.case_study.service.interfaces.IReservationService;
-import  hexaware.case_study.exception.*;
+import hexaware.case_study.entity.Reservation;
+import hexaware.case_study.exception.DatabaseConnectionException;
+import hexaware.case_study.exception.ReservationException;
+import hexaware.case_study.service.interfaces.IReservationService;
+import hexaware.case_study.util.DatabaseContext;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,9 +63,13 @@ public class ReservationService implements IReservationService {
     @Override
     public void cancelReservation(int reservationId) {
         try (Connection conn = DatabaseContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("DELETE FROM Reservations WHERE ReservationID = ?")) {
+             PreparedStatement stmt = conn.prepareStatement("DELETE FROM Reservations WHERE ReservationId = ?")) {
             stmt.setInt(1, reservationId);
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new IllegalArgumentException("No reservation found with ID: " + reservationId);
+            }
         } catch (SQLException e) {
             throw new DatabaseConnectionException(e.getMessage());
         }
